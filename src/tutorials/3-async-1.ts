@@ -30,7 +30,7 @@ const FS = {
     }),
 }
 
-export const prgramAsync = ({ path, url }: { url: string; path: string }) =>
+export const programAsync = ({ path, url }: { url: string; path: string }) =>
   pipe(
     Effect.all([
       HTTP.get(url),
