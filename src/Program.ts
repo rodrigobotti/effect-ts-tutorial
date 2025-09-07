@@ -8,6 +8,12 @@ import {
   programMatchCauseEffect,
   programMatchEffect,
 } from "./tutorials/10-match.js"
+import {
+  programRetryFixed as programRetryFixedDelay,
+  programRetryOrElse,
+  programRetryTimes,
+  programRetryUntil,
+} from "./tutorials/11-retry.js"
 import { programSync } from "./tutorials/2-sync.js"
 import { programAsync } from "./tutorials/3-async-1.js"
 import { prgramAsyncWithCleanup } from "./tutorials/3-async-2.js"
@@ -93,6 +99,12 @@ const programs = {
     runProgram("matching effects with effects", programMatchEffect),
     runProgram("matching cause", programMatchCause),
     runProgram("matching cause with effects", programMatchCauseEffect),
+  ],
+  "11": [
+    runProgram("retry with fixed schedule until success", programRetryFixedDelay),
+    runProgram("retry immediatly a fixed number of times", programRetryTimes),
+    runProgram("retry until condition is met", programRetryUntil),
+    runProgram("retry with fallback", programRetryOrElse),
   ],
 } as const
 
