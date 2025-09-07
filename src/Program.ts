@@ -9,6 +9,13 @@ import { programSuspend } from "./tutorials/4-suspend-1.js"
 import { prgramSuspendRecursive } from "./tutorials/4-suspend-2.js"
 import { programTracing } from "./tutorials/7-tracing-1.js"
 import { programTracingOtel } from "./tutorials/7-tracing-2.js"
+import { programCatchDefect, programExit } from "./tutorials/8-defects-2.js"
+import {
+  programFirstSuccessOf,
+  programOrElse,
+  programOrElseFail,
+  programOrElseSucceed,
+} from "./tutorials/9-fallback.js"
 
 const SEPARATOR = "-".repeat(100)
 
@@ -40,7 +47,13 @@ const program = Effect.all([ // run sequenially (`.all` without `{concurrency: n
   runProgram("Program 4.1", programSuspend),
   runProgram("Program 4.2", prgramSuspendRecursive(32)),
   runProgram("Program 7.1", programTracing(10)),
-  runProgram("Program 7.2", programTracingOtel, 0),
+  runProgram("Program 7.2", programTracingOtel),
+  runProgram("Program 8.2", programExit),
+  runProgram("Program 8.2", programCatchDefect),
+  runProgram("Program 9", programOrElse()),
+  runProgram("Program 9", programOrElseFail),
+  runProgram("Program 9", programOrElseSucceed),
+  runProgram("Program 9", programFirstSuccessOf(), 0),
 ], { discard: true })
 
 Effect.runPromise(program)
