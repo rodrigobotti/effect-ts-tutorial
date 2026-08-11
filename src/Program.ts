@@ -1,3 +1,5 @@
+import chalk from "chalk"
+import type { Cause } from "effect"
 import { Console, Effect, pipe } from "effect"
 import type { DurationInput } from "effect/Duration"
 import { program_1 } from "./tutorials/1-screwing-around.js"
@@ -14,6 +16,13 @@ import {
   programRetryTimes,
   programRetryUntil,
 } from "./tutorials/11-retry.js"
+import {
+  programTimeout,
+  programTimeoutInterruptible,
+  programTimeoutOption,
+  programTimeoutUninterruptible,
+  programTimoutExceeded as programTimeoutExceeded,
+} from "./tutorials/12-timeout.js"
 import { programSync } from "./tutorials/2-sync.js"
 import { programAsync } from "./tutorials/3-async-1.js"
 import { prgramAsyncWithCleanup } from "./tutorials/3-async-2.js"
@@ -32,7 +41,17 @@ import {
   programOrElseSucceed,
 } from "./tutorials/9-fallback.js"
 
-const SEPARATOR = "-".repeat(100)
+const colors = {
+  yellow: (s: unknown) => chalk.yellow(chalk.bold(s)),
+  blue: (s: unknown) => chalk.cyan(chalk.bold(s)),
+  green: (s: unknown) => chalk.green(chalk.bold(s)),
+  red: (s: unknown) => chalk.red(chalk.bold(s)),
+}
+
+const SEPARATOR = colors.yellow("-".repeat(100))
+
+const logError = (name: string) => <E>(e: E | Cause.Cause<E>) =>
+  Console.log(`\nProgram '${colors.blue(name)}' failed with ${colors.red(e)}`)
 
 const runProgram = <A, E>(
   name: string,
@@ -40,10 +59,13 @@ const runProgram = <A, E>(
   delay: DurationInput = "500 milli",
 ): Effect.Effect<void, never, never> =>
   pipe(
-    Console.log(`${SEPARATOR}\nRunning Program ${name}`),
+    Console.log(`${SEPARATOR}\nRunning Program '${colors.blue(name)}'`),
     Effect.andThen(program),
-    Effect.andThen((v) => Console.log(`\nProgram ${name} succeeded${v !== undefined ? ` with ${v} !` : "!"}`)),
-    Effect.catchAll((e) => Console.log(`\nProgram ${name} failed with ${e}`)),
+    Effect.andThen((v) =>
+      Console.log(`\nProgram '${colors.blue(name)}' succeeded${v !== undefined ? ` with ${colors.green(v)} !` : "!"}`)
+    ),
+    Effect.catchAll(logError(name)),
+    Effect.catchAllCause(logError(name)),
     Effect.tap(Effect.sleep(delay)),
   )
 
@@ -105,6 +127,13 @@ const programs = {
     runProgram("retry immediatly a fixed number of times", programRetryTimes),
     runProgram("retry until condition is met", programRetryUntil),
     runProgram("retry with fallback", programRetryOrElse),
+  ],
+  "12": [
+    runProgram("timeout", programTimeout),
+    runProgram("timeout exceeded", programTimeoutExceeded),
+    runProgram("handling timeouts with options", programTimeoutOption),
+    runProgram("interrupts operation on timeout", programTimeoutInterruptible),
+    runProgram("runs to completion before failing with timeout", programTimeoutUninterruptible),
   ],
 } as const
 
